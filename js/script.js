@@ -98,12 +98,14 @@ window.addEventListener('DOMContentLoaded', () => {
         btnOpenModal = document.querySelectorAll('[data-modal]'),
         btnCloseModal = document.querySelector('[data-close]');
 
+    function openModal() {
+        modal.classList.remove('hide');
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden'; //disable scroll function of the window when modal is opened
+        clearInterval(modalTimerId);
+    }
     btnOpenModal.forEach(item => {
-        item.addEventListener('click', () => {
-            modal.classList.remove('hide');
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden'; //disable scroll function of the window when modal is opened
-        });
+        item.addEventListener('click', openModal);
     });
 
     function closeModal() {
@@ -125,4 +127,15 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
+
+    const modalTimerId = setTimeout(openModal, 10000);
+
+    function showModalByScroll() { //if user scrolled down till the end of the page modal will pop-up automatically
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+            openModal();
+            window.removeEventListener('scroll', showModalByScroll); //thus modal will be showed by scroll only once
+        }
+    }
+
+    window.addEventListener('scroll', showModalByScroll);
 });
