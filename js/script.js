@@ -92,5 +92,37 @@ window.addEventListener('DOMContentLoaded', () => {
     setClock('.timer', deadline);
     console.log(new Date(Date.parse(deadline)));
 
+    /* Modal */
 
+    const modal = document.querySelector('.modal'),
+        btnOpenModal = document.querySelectorAll('[data-modal]'),
+        btnCloseModal = document.querySelector('[data-close]');
+
+    btnOpenModal.forEach(item => {
+        item.addEventListener('click', () => {
+            modal.classList.remove('hide');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; //disable scroll function of the window when modal is opened
+        });
+    });
+
+    function closeModal() {
+        modal.classList.remove('show');
+        modal.classList.add('hide');
+        document.body.style.overflow = '';
+    }
+
+    btnCloseModal.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => { //if user clicks anywhere besides the opened modal, modal should close
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => { //if user press esc button on keyboard, modal should close
+        if (e.code === 'Escape' && modal.classList.contains('show')) {
+            closeModal();
+        }
+    });
 });
