@@ -142,13 +142,14 @@ window.addEventListener('DOMContentLoaded', () => {
     /* Classes for menu */
 
     class MenuCard {
-        constructor(src, alt, title, descr, price, parentSelector) {
+        constructor(src, alt, title, descr, price, parentSelector, ...classes) {
             this.src = src;
             this.alt = alt;
             this.title = title;
             this.descr = descr;
             this.price = price;
             this.parent = document.querySelector(parentSelector);
+            this.classes = classes;
             this.rate = 27; //currency exchange rate
             this.exchangeToUAH(); //rewrite price value according exchange rate
         }
@@ -159,8 +160,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
         render() {
             const element = document.createElement('div');
-            element.innerHTML = `
-            <div class="menu__item">
+
+            if (this.classes.length === 0) { //set default value
+                this.e = 'menu__item';
+                element.classList.add(this.e);
+            } else {
+                this.classes.forEach(className => element.classList.add(className));
+            }
+
+            element.innerHTML = `            
                 <img src=${this.src} alt=${this.alt}>
                 <h3 class="menu__item-subtitle">${this.title}</h3>
                 <div class="menu__item-descr">${this.descr}</div>
@@ -168,8 +176,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 <div class="menu__item-price">
                     <div class="menu__item-cost">Цена:</div>
                     <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
-                </div>
-            </div>
+                </div>            
             `;
             this.parent.append(element);
         }
@@ -181,7 +188,9 @@ window.addEventListener('DOMContentLoaded', () => {
         'Меню "Фитнес"',
         'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
         9,
-        '.menu .container'
+        '.menu .container',
+        'menu__item',
+        'big'
     );
     menu1.render();
 
@@ -192,6 +201,7 @@ window.addEventListener('DOMContentLoaded', () => {
         'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
         21,
         '.menu .container'
+
     ).render(); //if we use object only once it is ok not to declare variable
 
     new MenuCard(
@@ -200,6 +210,63 @@ window.addEventListener('DOMContentLoaded', () => {
         'Меню "Постное"',
         'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
         14,
-        '.menu .container'
+        '.menu .container',
+        'menu__item'
     ).render(); //if we use object only once it is ok not to declare variable
+
+    /* Forms */
+    const forms = document.querySelectorAll('form');
+
+    const message = {
+        loading: 'Loading',
+        success: 'Thank you! we will contact you soon.',
+        failure: 'Something went wrong'
+    };
+
+    forms.forEach(item => { //assign function postData to each form on the page
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+            // request.setRequestHeader('Content-type', 'multipart/form-data'); //multipart/form-data is used for FormData type, but no need to set request header for formData, it is set automatically
+
+            request.setRequestHeader('Content-type', 'application/json'); //if we want to send data as JSON object
+
+            const formData = new FormData(form); //imprtant - input divs has to contain unique name attribute in order FormData correctly form object (key, value)
+
+            const object = {};
+
+            formData.forEach(function(value, key) { //convert FormData object to plain object
+                object[key] = value;
+            });
+
+            const json = JSON.stringify(object); //convert plain object to JSON
+
+            // request.send(formData);//if we want to send FromData object
+            request.send(json); //if we want to send JSON object
+
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    form.reset(); //cleaar form
+                    setTimeout(() => { //remove message after 2 sec
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        });
+    }
 });
