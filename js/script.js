@@ -39,7 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     /* Timer */
 
-    const deadline = '2022-04-11';
+    const deadline = '2022-05-06';
 
     function getTimeRemaining(endtime) { //get difference between current date and arg date
         const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -95,8 +95,8 @@ window.addEventListener('DOMContentLoaded', () => {
     /* Modal */
 
     const modal = document.querySelector('.modal'),
-        btnOpenModal = document.querySelectorAll('[data-modal]'),
-        btnCloseModal = document.querySelector('[data-close]');
+        btnOpenModal = document.querySelectorAll('[data-modal]');
+    // btnCloseModal = document.querySelector('[data-close]'); this approach would not work with the dynamic created content
 
     function openModal() {
         modal.classList.remove('hide');
@@ -114,10 +114,10 @@ window.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
     }
 
-    btnCloseModal.addEventListener('click', closeModal);
+    // btnCloseModal.addEventListener('click', closeModal); this approach would not work with the dynamic created content
 
     modal.addEventListener('click', (e) => { //if user clicks anywhere besides the opened modal, modal should close
-        if (e.target === modal) {
+        if (e.target === modal || e.target.getAttribute('data-close') == '') { //addid getAttribute to close modal
             closeModal();
         }
     });
@@ -128,7 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const modalTimerId = setTimeout(openModal, 10000);
+    const modalTimerId = setTimeout(openModal, 50000);
 
     function showModalByScroll() { //if user scrolled down till the end of the page modal will pop-up automatically
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
@@ -218,7 +218,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('form');
 
     const message = {
-        loading: 'Loading',
+        loading: 'icons/spinner.svg',
         success: 'Thank you! we will contact you soon.',
         failure: 'Something went wrong'
     };
@@ -231,10 +231,14 @@ window.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const statusMessage = document.createElement('div');
-            statusMessage.classList.add('status');
-            statusMessage.textContent = message.loading;
-            form.append(statusMessage);
+            const statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
+            `;
+            // form.append(statusMessage);
+            form.insertAdjacentElement('afterend', statusMessage); //works better for form that is in order section, not in modal
 
             const request = new XMLHttpRequest();
             request.open('POST', 'server.php');
@@ -258,15 +262,42 @@ window.addEventListener('DOMContentLoaded', () => {
             request.addEventListener('load', () => {
                 if (request.status === 200) {
                     console.log(request.response);
-                    statusMessage.textContent = message.success;
+                    showThanksModal(message.success);
                     form.reset(); //cleaar form
-                    setTimeout(() => { //remove message after 2 sec
-                        statusMessage.remove();
-                    }, 2000);
+                    // setTimeout(() => { //remove message after 2 sec
+                    statusMessage.remove(); //remove spinner
+                    // }, 2000);
+
                 } else {
-                    statusMessage.textContent = message.failure;
+                    // statusMessage.textContent = message.failure;
+                    showThanksModal(message.failure);
                 }
             });
         });
+    }
+
+    function showThanksModal(message) { //create info modal after form was submitted
+        const prevModalDialog = document.querySelector('.modal__dialog');
+
+        prevModalDialog.classList.add('hide'); //hide form from modal
+        openModal(); //open modal with form hidden
+
+        const thanksModal = document.createElement('div'); //create new block
+        thanksModal.classList.add('modal__dialog'); //add styles
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>&times;</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `; //fill new block with necessary content
+
+        document.querySelector('.modal').append(thanksModal); //add new block to maodal
+
+        setTimeout(() => { //bring back default settings for modal
+            thanksModal.remove();
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            closeModal();
+        }, 4000);
     }
 });
