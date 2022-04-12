@@ -240,11 +240,12 @@ window.addEventListener('DOMContentLoaded', () => {
             // form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage); //works better for form that is in order section, not in modal
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
+            /* Using XMLHttpRequest */
+            // const request = new XMLHttpRequest();
+            // request.open('POST', 'server.php');
             // request.setRequestHeader('Content-type', 'multipart/form-data'); //multipart/form-data is used for FormData type, but no need to set request header for formData, it is set automatically
 
-            request.setRequestHeader('Content-type', 'application/json'); //if we want to send data as JSON object
+            // request.setRequestHeader('Content-type', 'application/json'); //if we want to send data as JSON object
 
             const formData = new FormData(form); //imprtant - input divs has to contain unique name attribute in order FormData correctly form object (key, value)
 
@@ -254,25 +255,46 @@ window.addEventListener('DOMContentLoaded', () => {
                 object[key] = value;
             });
 
-            const json = JSON.stringify(object); //convert plain object to JSON
+            // const json = JSON.stringify(object); //convert plain object to JSON
 
             // request.send(formData);//if we want to send FromData object
-            request.send(json); //if we want to send JSON object
+            // request.send(json); //if we want to send JSON object
 
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
+            /* Using fetch api */
+            fetch('server.php', {
+                    method: "POST",
+                    headers: { //if we send JSON
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify(object)
+                        // body: formData
+
+                })
+                .then(data => data.text()) //parse data                
+                .then(data => { //proceed result wit fetch
+                    console.log(data);
                     showThanksModal(message.success);
-                    form.reset(); //cleaar form
-                    // setTimeout(() => { //remove message after 2 sec
-                    statusMessage.remove(); //remove spinner
-                    // }, 2000);
-
-                } else {
-                    // statusMessage.textContent = message.failure;
+                    statusMessage.remove(); //remove spinner                    
+                }).catch(() => {
                     showThanksModal(message.failure);
-                }
-            });
+                }).finally(() => {
+                    form.reset(); //clear form
+                });
+
+            // request.addEventListener('load', () => {//proceed response with XMLHttpRequest
+            //     if (request.status === 200) {
+            //         console.log(request.response);
+            //         showThanksModal(message.success);
+            //         form.reset(); //clear form
+            //         // setTimeout(() => { //remove message after 2 sec
+            //         statusMessage.remove(); //remove spinner
+            //         // }, 2000);
+
+            //     } else {
+            //         // statusMessage.textContent = message.failure;
+            //         showThanksModal(message.failure);
+            //     }
+            // });
         });
     }
 
