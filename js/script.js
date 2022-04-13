@@ -315,7 +315,49 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    fetch('http://localhost:3000/menu')
-        .then(data => data.json())
-        .then(res => console.log(res));
+    /* Slider */
+    const slides = document.querySelectorAll('.offer__slide'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        currentSlide = document.querySelector('#current'),
+        totalSlides = document.querySelector('#total');
+    let slideIndex = 1; //default position of our slider
+
+    totalSlides.textContent = getZero(slides.length);
+
+
+    showSlides(slideIndex); //we need to run function at the beginning to set default behavior
+
+    function showSlides(n) {
+        if (n > slides.length) { //if we reached the end of slider we return to the beginning
+            slideIndex = 1;
+        }
+
+        if (n < 1) { //if we want to go beyond the beginning we return to the end of the slider
+            slideIndex = slides.length;
+        }
+
+        slides.forEach(item => { //hide all slides
+            item.classList.remove('show');
+            item.classList.add('hide');
+        });
+
+        slides[slideIndex - 1].classList.remove('hide'); //show slide by index
+        slides[slideIndex - 1].classList.add('show');
+
+        currentSlide.textContent = getZero(slideIndex);
+    }
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    prev.addEventListener('click', () => {
+        plusSlides(-1);
+    });
+
+    next.addEventListener('click', () => {
+        plusSlides(1);
+    });
+
 });
