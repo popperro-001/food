@@ -320,44 +320,97 @@ window.addEventListener('DOMContentLoaded', () => {
         prev = document.querySelector('.offer__slider-prev'),
         next = document.querySelector('.offer__slider-next'),
         currentSlide = document.querySelector('#current'),
-        totalSlides = document.querySelector('#total');
+        totalSlides = document.querySelector('#total'),
+        slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+        slidesField = document.querySelector('.offer__slider-inner'),
+        width = window.getComputedStyle(slidesWrapper).width;
     let slideIndex = 1; //default position of our slider
+    let offset = 0;
 
     totalSlides.textContent = getZero(slides.length);
 
+    currentSlide.textContent = getZero(slideIndex);
 
-    showSlides(slideIndex); //we need to run function at the beginning to set default behavior
+    /*     totalSlides.textContent = getZero(slides.length);
 
-    function showSlides(n) {
-        if (n > slides.length) { //if we reached the end of slider we return to the beginning
-            slideIndex = 1;
+
+        showSlides(slideIndex); //we need to run function at the beginning to set default behavior
+
+        function showSlides(n) {
+            if (n > slides.length) { //if we reached the end of slider we return to the beginning
+                slideIndex = 1;
+            }
+
+            if (n < 1) { //if we want to go beyond the beginning we return to the end of the slider
+                slideIndex = slides.length;
+            }
+
+            slides.forEach(item => { //hide all slides
+                item.classList.remove('show');
+                item.classList.add('hide');
+            });
+
+            slides[slideIndex - 1].classList.remove('hide'); //show slide by index
+            slides[slideIndex - 1].classList.add('show');
+
+            currentSlide.textContent = getZero(slideIndex);
         }
 
-        if (n < 1) { //if we want to go beyond the beginning we return to the end of the slider
-            slideIndex = slides.length;
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
         }
 
-        slides.forEach(item => { //hide all slides
-            item.classList.remove('show');
-            item.classList.add('hide');
+        prev.addEventListener('click', () => {
+            plusSlides(-1);
         });
 
-        slides[slideIndex - 1].classList.remove('hide'); //show slide by index
-        slides[slideIndex - 1].classList.add('show');
+        next.addEventListener('click', () => {
+            plusSlides(1);
+        }); */
 
-        currentSlide.textContent = getZero(slideIndex);
-    }
+    /* Slider advanced */
+    slidesField.style.width = 100 * slides.length + '%'; //all slides are placed inside the sliderWrapper
+    slidesField.style.display = 'flex'; //get all slides stand in line
+    slidesField.style.transition = '0.5s all'; //set smooth transition
 
-    function plusSlides(n) {
-        showSlides(slideIndex += n);
-    }
-
-    prev.addEventListener('click', () => {
-        plusSlides(-1);
+    slidesWrapper.style.overflow = 'hidden'; //hide all slides that are off the visibility area
+    slides.forEach(item => {
+        item.style.width = width; //set all slides equal width, so we can be sure they are all fit in slidesField
     });
 
     next.addEventListener('click', () => {
-        plusSlides(1);
+        if (offset == +parseInt(width) * (slides.length - 1)) { //if we reached the end of slider we return to the beginning, aslo we need to parseInt because width = string(ex '500px')
+            offset = 0;
+        } else {
+            offset += +parseInt(width);
+        }
+        slidesField.style.transform = `translateX(-${offset}px)`;
+
+        if (slideIndex == slides.length) {
+            slideIndex = 1;
+        } else {
+            slideIndex++;
+        }
+
+        currentSlide.textContent = getZero(slideIndex);
     });
+
+    prev.addEventListener('click', () => {
+        if (offset == 0) { //if we want to go beyond the beginning we return to the end of the slider
+            offset = +parseInt(width) * (slides.length - 1);
+        } else {
+            offset -= +parseInt(width);
+        }
+        slidesField.style.transform = `translateX(-${offset}px)`;
+
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        } else {
+            slideIndex--;
+        }
+
+        currentSlide.textContent = getZero(slideIndex);
+    });
+
 
 });
