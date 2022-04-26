@@ -340,6 +340,29 @@ window.addEventListener('DOMContentLoaded', () => {
 
     currentSlide.textContent = getZero(slideIndex);
 
+    /* Slider navigation */
+    const slider = document.querySelector('.offer__slider');
+
+    slider.style.position = 'relative'; //put parent element positon relative thus we can position absolute inner element
+
+    const indicators = document.createElement('ol'), //create ordered list
+        dots = [];
+    indicators.classList.add('carousel-indicators'); //add stiles to ol
+
+    slider.append(indicators); //put ol into slider
+
+    for (let i = 0; i < slides.length; i++) { //create list item for each slide
+        const dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i + 1); //set data attribute to each list item so we can reffer to it in the future
+        dot.classList.add('dot');
+        if (i == 0) { //highlight default element
+            dot.style.opacity = 1;
+        }
+
+        indicators.append(dot); //put dot element into ol   
+        dots.push(dot);
+    }
+
     /*     totalSlides.textContent = getZero(slides.length);
 
 
@@ -387,6 +410,11 @@ window.addEventListener('DOMContentLoaded', () => {
         item.style.width = width; //set all slides equal width, so we can be sure they are all fit in slidesField
     });
 
+    function activeDot(index) {
+        dots.forEach(dot => dot.style.opacity = '0.5'); //put all dots to inactive state
+        dots[index - 1].style.opacity = 1; //highlight active element
+    }
+
     next.addEventListener('click', () => {
         if (offset == +parseInt(width) * (slides.length - 1)) { //if we reached the end of slider we return to the beginning, aslo we need to parseInt because width = string(ex '500px')
             offset = 0;
@@ -402,6 +430,8 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         currentSlide.textContent = getZero(slideIndex);
+
+        activeDot(slideIndex);
     });
 
     prev.addEventListener('click', () => {
@@ -419,7 +449,23 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         currentSlide.textContent = getZero(slideIndex);
+
+        activeDot(slideIndex);
     });
 
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => { //get event object
+            const slideTo = e.target.getAttribute('data-slide-to');
 
+            slideIndex = slideTo; //set slide index using attribute value
+
+            offset = +parseInt(width) * (slideTo - 1); //set offset using attribute value
+
+            slidesField.style.transform = `translateX(-${offset}px)`;
+
+            currentSlide.textContent = getZero(slideIndex);
+
+            activeDot(slideIndex);
+        });
+    });
 });
