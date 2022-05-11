@@ -1,3 +1,5 @@
+import {getResource} from '../services/services';
+
 function cards() {
     /* Classes for menu */
 
@@ -42,16 +44,6 @@ function cards() {
         }
     }
 
-    const getResource = async(url) => { //common GET function to be reusable
-        const result = await fetch(url);
-
-        if (!result.ok) { //fetch does not handle 400 or 500 errors, so we need to handle it manually by catching the error
-            throw new Error(`Could not fetch ${url}, status: ${result.status}`);
-        }
-
-        return await result.json();
-    };
-
     getResource('http://localhost:3000/menu')
         .then(data => {
             data.forEach(({ img, altimg, title, descr, price }) => { //({}) - desconstruction of the object
@@ -60,4 +52,4 @@ function cards() {
         });
 }
 
-module.exports = cards;
+export default cards;

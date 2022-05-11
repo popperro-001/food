@@ -1,12 +1,14 @@
-function slider() {
+import {getZero} from './timer';
+
+function slider({container, slide, nextArrow, prevArrow, totalCounter, currentCounter, wrapper, field}) {//using decomposition
     /* Slider */
-    const slides = document.querySelectorAll('.offer__slide'),
-        prev = document.querySelector('.offer__slider-prev'),
-        next = document.querySelector('.offer__slider-next'),
-        currentSlide = document.querySelector('#current'),
-        totalSlides = document.querySelector('#total'),
-        slidesWrapper = document.querySelector('.offer__slider-wrapper'),
-        slidesField = document.querySelector('.offer__slider-inner'),
+    const slides = document.querySelectorAll(slide),
+        prev = document.querySelector(prevArrow),
+        next = document.querySelector(nextArrow),
+        currentSlide = document.querySelector(currentCounter),
+        totalSlides = document.querySelector(totalCounter),
+        slidesWrapper = document.querySelector(wrapper),
+        slidesField = document.querySelector(field),
         width = window.getComputedStyle(slidesWrapper).width;
     let slideIndex = 1; //default position of our slider
     let offset = 0;
@@ -16,7 +18,7 @@ function slider() {
     currentSlide.textContent = getZero(slideIndex);
 
     /* Slider navigation */
-    const slider = document.querySelector('.offer__slider');
+    const slider = document.querySelector(container);
 
     slider.style.position = 'relative'; //put parent element positon relative thus we can position absolute inner element
 
@@ -146,4 +148,4 @@ function slider() {
 
 }
 
-module.exports = slider;
+export default slider;

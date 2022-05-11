@@ -1,8 +1,15 @@
-function timer() {
+function getZero(num) { //function to add 0 if digit is less than 10
+    if (num >= 0 && num < 10) {
+        return `0${num}`;
+    } else {
+        return num;
+    }
+}
+
+
+function timer(id, deadline) {
     /* Timer */
-
-    const deadline = '2022-05-06';
-
+    
     function getTimeRemaining(endtime) { //get difference between current date and arg date
         let days, hours, minutes, seconds;
         const t = Date.parse(endtime) - Date.parse(new Date());
@@ -28,13 +35,6 @@ function timer() {
         };
     }
 
-    function getZero(num) { //function to add 0 if digit is less than 10
-        if (num >= 0 && num < 10) {
-            return `0${num}`;
-        } else {
-            return num;
-        }
-    }
 
     function setClock(selector, endtime) {
         const timer = document.querySelector(selector),
@@ -60,8 +60,9 @@ function timer() {
         }
     }
 
-    setClock('.timer', deadline);
+    setClock(id, deadline);
     // console.log(new Date(Date.parse(deadline)));
 }
 
-module.exports = timer;
+export default timer;
+export {getZero};

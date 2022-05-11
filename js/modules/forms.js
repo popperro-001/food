@@ -1,6 +1,9 @@
-function forms() {
+import {closeModal, openModal} from './modal';
+import {postData} from '../services/services';
+
+function forms(formSelector, modalTimerId) {
     /* Forms */
-    const forms = document.querySelectorAll('form');
+    const forms = document.querySelectorAll(formSelector);
 
     const message = {
         loading: 'icons/spinner.svg',
@@ -12,17 +15,6 @@ function forms() {
         bindPostData(item);
     });
 
-    const postData = async(url, data) => { //common function to handle fitch POST requests
-        const result = await fetch(url, { //remember this is async code, error could be when result.json(), second when return, we need to use async before the function and await in the body of function
-            method: "POST",
-            headers: { //if we send JSON
-                'Content-type': 'application/json'
-            },
-            body: data
-        });
-
-        return await result.json(); //proceed data to json and return as promise
-    };
 
     function bindPostData(form) {
         form.addEventListener('submit', (e) => {
@@ -92,7 +84,7 @@ function forms() {
         const prevModalDialog = document.querySelector('.modal__dialog');
 
         prevModalDialog.classList.add('hide'); //hide form from modal
-        openModal(); //open modal with form hidden
+        openModal('.modal', modalTimerId); //open modal with form hidden
 
         const thanksModal = document.createElement('div'); //create new block
         thanksModal.classList.add('modal__dialog'); //add styles
@@ -109,9 +101,9 @@ function forms() {
             thanksModal.remove();
             prevModalDialog.classList.add('show');
             prevModalDialog.classList.remove('hide');
-            closeModal();
+            closeModal('.modal');
         }, 4000);
     }
 }
 
-module.exports = forms;
+export default forms;
